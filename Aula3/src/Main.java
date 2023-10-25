@@ -3,8 +3,10 @@ public class Main {
         Cliente caio = new Cliente("Caio Agra Lemos", "14171458463");
         Cliente zeca_pg = new Cliente("Zeca Pau Gordinho", "192391231");
 
-        caio.conta.Extrato();
-        caio.conta.Deposito(1230.91299F);
-        caio.conta.Saque(1232);
+        caio.adicionarConta();
+        caio.adicionarConta();
+        caio.adicionarConta();
+        caio.adicionarConta();
+        caio.listarContas();
     }
 }
