@@ -3,7 +3,7 @@ public class contaBancaria {
     private final int num_conta;
     private float saldo;
 
-    contaBancaria() {
+    public contaBancaria() {
         qtdContas++;
         this.num_conta = qtdContas;
         this.saldo = 0;
@@ -19,7 +19,7 @@ public class contaBancaria {
                 System.out.println("Você não tem saldo suficiente!");
             } else {
                 this.saldo -= valor;
-                System.out.println("Saque realizado com sucesso:");
+                System.out.println("Saque de R$ " + valor + " realizado com sucesso:");
             }
         } else {
             System.out.println("Saque inválido, verifique o valor e tente novamente.");
@@ -30,10 +30,18 @@ public class contaBancaria {
     void Deposito (float valor) {
         if (valor > 0) {
             this.saldo += valor;
-            System.out.println("Saque realizado com sucesso:");
+            System.out.println("Depósito de R$ " + valor + " realizado com sucesso:");
         } else {
             System.out.println("Depósito inválido, verifique o valor e tente novamente.");
         }
         this.Extrato();
+    }
+
+    public float getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(float valor) {
+        this.saldo += valor;
     }
 }

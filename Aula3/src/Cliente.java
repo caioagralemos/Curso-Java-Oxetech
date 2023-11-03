@@ -30,6 +30,23 @@ public class Cliente {
         }
     }
 
+    void adicionarContaEspecial(float valorCredito) {
+        boolean success = false;
+        for (int i = 0; i < this.contas.length; i++) {
+            if (this.contas[i] == null) {
+                this.contas[i] = new contaEspecial(valorCredito);
+                success = true;
+                break;
+            }
+        }
+
+        if (success == true) {
+            System.out.println("Conta especial adicionada com sucesso.");
+        } else {
+            System.out.println("Não foi possível adicionar a conta.");
+        }
+    }
+
     void removerConta() {
         boolean success = false;
         for (int i = this.contas.length-1; i >= 0; i++) {
