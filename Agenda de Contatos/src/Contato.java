@@ -11,6 +11,13 @@ public class Contato {
         this.email = email;
     }
 
+    public Contato(int id, String nome, String numero) {
+        this.id = id;
+        this.nome = nome;
+        this.numero = numero;
+        this.email = null;
+    }
+
     public int getId() {
         return id;
     }

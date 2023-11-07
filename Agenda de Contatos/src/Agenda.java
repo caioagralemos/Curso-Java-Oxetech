@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Agenda {
@@ -13,26 +14,26 @@ public class Agenda {
         this.ids++;
     }
 
-    public void adicionarContato() {
+    private void adicionarContato() {
         int id = this.ids;
 
         System.out.println("Digite o nome do contato: ");
         String nome = input.nextLine();
-        while (nome == "" || nome == " ") {
+        while (Objects.equals(nome, "") || Objects.equals(nome, " ")) {
             System.out.println("Nome inválido\nDigite o nome do contato: ");
             nome = input.nextLine();
         }
 
         System.out.println("Digite o número do contato: ");
         String numero = input.nextLine().strip();
-        while (numero == "") {
+        while (Objects.equals(numero, "")) {
             System.out.println("Número inválido\nDigite o número do contato: ");
             numero = input.nextLine();
         }
 
         System.out.println("Digite o email do contato (opcional): ");
         String email = input.nextLine().strip();
-        if (email == "") {
+        if (email.isEmpty()) {
             email = null;
         }
 
@@ -40,7 +41,7 @@ public class Agenda {
         raiseIds();
     }
 
-    public void listarContatos() {
+    private void listarContatos() {
         System.out.println("SUA AGENDA:");
         for (int i = 0; i < ids; i++) {
             System.out.println(" - CONTATO (id: " + (contatos[i].getId() + 1) + "):");
@@ -52,7 +53,7 @@ public class Agenda {
         }
     }
 
-    public void editarContato(int id) {
+    private void editarContato(int id) {
         if (id > 0 && id < this.ids) {
             int num = id - 1;
             System.out.println("ALTERANDO CONTATO:");
@@ -69,10 +70,10 @@ public class Agenda {
                 contatos[num].setNumero(numero);
             }
 
-            if (contatos[num].getEmail() == "") {
+            if (Objects.equals(contatos[num].getEmail(), "")) {
                 System.out.println("Digite o email do contato (opcional): ");
                 String email = input.nextLine().strip();
-                if (email == "") {
+                if (email.isEmpty()) {
                     email = null;
                 } else {
                     contatos[num].setEmail(email);
@@ -80,7 +81,7 @@ public class Agenda {
             } else {
                 System.out.println("Digite o email do contato (ou deixe em branco para continuar com '" + contatos[num].getEmail() + "'): ");
                 String email = input.nextLine().strip();
-                if (numero != "") {
+                if (!numero.isEmpty()) {
                     contatos[num].setEmail(email);
                 }
             }
@@ -91,5 +92,34 @@ public class Agenda {
     }
 
 
+    public void excluirContato(int id) {
+        if (id > 0 && id < this.ids) {
+            this.contatos[id-1] = null;
+        } else {
+            System.out.println("Id inválido! Não foi possível excluir");
+        }
+    }
+
+    public void consultarAgenda() {
+        System.out.println("CONSULTANDO SUA AGENDA:");
+        String entrada;
+        while (true) {
+            System.out.println("Escolha sua consulta:\n   - 1 para listar seus contatos\n   - 2 para adicionar contato\n   - 3 para excluir contato\n   - qualquer outra tecla para sair");
+            entrada = input.nextLine().strip();
+            if (!entrada.equals("1") && !entrada.equals("2") && !entrada.equals("3")) {
+                break;
+            } else {
+                if (entrada.equals("1")) {
+                    this.listarContatos();
+                } else if (entrada.equals("2")) {
+                    this.adicionarContato();
+                } else if (entrada.equals("3")) {
+                    System.out.println("Digite o id do contato que deseja excluir:");
+                    int id = input.nextInt();
+                    this.excluirContato(id);
+                }
+            }
+        }
+    }
 
 }
