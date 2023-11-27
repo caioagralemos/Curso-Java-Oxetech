@@ -4,18 +4,47 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main {
+    static class Calculator {
+        public static String num = "0";
+        public static int memoria = 0;
+        public static String operacao = "+";
+        public static String ButtonPressed(JButton botao) {
+            if (num.equals("0")) {
+                num = botao.getText();
+            } else {
+                num = num + botao.getText();
+            }
+
+            return num;
+        }
+
+        public static String reset() {
+            num = "0";
+            return num;
+        }
+    }
+
     public static void main(String[] args) {
-        String num = "0";
         JFrame calculadora = new JFrame("Calculadora");
 
         JPanel visor = new JPanel();
-        visor.add(new JLabel(num));
+        visor.add(new JLabel(Calculator.num));
         visor.setSize(100, 290);
         visor.setBackground(Color.gray);
-        visor.setLayout(new BorderLayout());
-        calculadora.add(visor, BorderLayout.CENTER);
+        calculadora.add(visor);
+
 
         JButton botao_c = new JButton("(C)");
+        botao_c.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Calculator.reset();
+                visor.removeAll();
+                visor.add(new JLabel(Calculator.num));
+                calculadora.revalidate();
+            }
+        });
+
         JButton botao_igual = new JButton("(=)");
         JButton botao_adicao = new JButton("(+)");
         JButton botao_subtracao = new JButton("(-)");
@@ -42,16 +71,15 @@ public class Main {
         calculadora.add(new JButton());
 
         for (JButton botao : botoes) {
-//            botao.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    if (this.num.equals("0")) {
-//                        this.num = botao.getText();
-//                    } else {
-//                        this.num = this.num + botao.getText();
-//                    }
-//                }
-//            });
+            botao.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Calculator.num = Calculator.ButtonPressed(botao);
+                    visor.removeAll();
+                    visor.add(new JLabel(Calculator.num));
+                    calculadora.revalidate();
+            }
+            });
             if (botao.getText().equals("9")) {
                 calculadora.add(botao_c);
                 calculadora.add(botao);
