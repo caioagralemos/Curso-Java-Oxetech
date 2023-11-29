@@ -12,7 +12,7 @@ public class TaskManager {
     private void userInterface() {
         System.out.println("Bem-vindo(a) ao TaskManager.");
         while (true) {
-            System.out.println("Escolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para printar tarefas\noutro para sair\nsua escolha: ");
+            System.out.println("\nEscolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para printar tarefas\noutro para sair\nsua escolha: ");
             String escolha = input.nextLine().strip();
             if (escolha.equals("1")) {
                 System.out.println("\nAdicionando tarefa:");
