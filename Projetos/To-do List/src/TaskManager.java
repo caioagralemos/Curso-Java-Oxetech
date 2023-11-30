@@ -1,35 +1,62 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import com.google.gson.Gson;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 public class TaskManager {
     ArrayList<Task> tasks = new ArrayList<Task>();
+    Gson gson = new Gson();
     Scanner input = new Scanner(System.in);
 
     public TaskManager() {
+        try {
+            Path path = Paths.get("./data.json");
+            String json = String.valueOf(Files.readAllLines(path));
+            JSONObject tarefas = new JsonObject();
+            this.tasks = gson.fromJson(json, new TypeToken<ArrayList<Task>>() {}.getType());
+            System.out.println(this.tasks);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         userInterface();
     }
 
     private void userInterface() {
-        System.out.println("Bem-vindo(a) ao TaskManager.");
+        System.out.println("\nBem-vindo(a) ao TaskManager.");
         while (true) {
             System.out.println("\nEscolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para printar tarefas\noutro para sair\nsua escolha: ");
             String escolha = input.nextLine().strip();
             if (escolha.equals("1")) {
-                System.out.println("\nAdicionando tarefa:");
+                System.out.println("\nAdicionando tarefa:".toUpperCase());
                 novaTask();
             } else if (escolha.equals("2")) {
-                System.out.println("\nRemovendo tarefa:");
+                System.out.println("\nRemovendo tarefa:".toUpperCase());
                 removeTask();
             } else if (escolha.equals("3")) {
-                System.out.println("\nMarcando tarefa:");
+                System.out.println("\nMarcando tarefa:".toUpperCase());
                 marcarTask();
             } else if (escolha.equals("4")) {
-                System.out.println("\nPrintando tarefas:");
+                System.out.println("\nPrintando tarefas:".toUpperCase());
                 printaTasks();
             } else {
                 System.out.println("Digite S para confirmar sua saída do programa: ");
                 String escolha2 = input.nextLine().strip().toUpperCase();
                 if (escolha2.equals("S")) {
+                    System.out.println("Tentando salvar os seus dados...");
+                    String json = gson.toJson(tasks);
+                    try (FileWriter fileWriter = new FileWriter("./data.json")) {
+                        fileWriter.write(json);
+                        System.out.println("Dados salvos com sucesso.");
+                    } catch (IOException e) {
+                        System.out.println("Não foi possível salvar seus dados.");
+                    }
                     System.out.println("Obrigado por utilizar o TaskManager.");
                     break;
                 }
