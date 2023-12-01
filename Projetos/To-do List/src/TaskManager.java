@@ -18,10 +18,9 @@ public class TaskManager {
     public TaskManager() {
         try {
             Path path = Paths.get("./data.json");
-            String json = String.valueOf(Files.readAllLines(path));
-            JSONObject tarefas = new JsonObject();
-            this.tasks = gson.fromJson(json, new TypeToken<ArrayList<Task>>() {}.getType());
-            System.out.println(this.tasks);
+            byte[] jsonData = Files.readAllBytes(path);
+            String json = new String(jsonData);
+            tasks = gson.fromJson(json, new TypeToken<ArrayList<Task>>(){}.getType());
         } catch (Exception e) {
             System.out.println(e);
         }
