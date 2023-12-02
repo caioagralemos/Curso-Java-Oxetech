@@ -6,6 +6,13 @@ public class Data {
     int mes;
     int ano;
     Calendar cal = GregorianCalendar.getInstance();
+
+    public Data() {
+        this.ano = cal.get(Calendar.YEAR);
+        this.mes = cal.get(Calendar.MONTH) + 1;
+        this.dia = cal.get(Calendar.DATE);
+    }
+
     public Data (int dia, int mes, int ano) {
         if (ano > cal.get(Calendar.YEAR)) {
             this.ano = ano;
@@ -65,6 +72,6 @@ public class Data {
         }
     }
     public String toString() {
-        return this.dia+"/"+this.mes+"/"+this.ano;
+        return this.dia + "/" + this.mes + "/" + this.ano;
     }
 }

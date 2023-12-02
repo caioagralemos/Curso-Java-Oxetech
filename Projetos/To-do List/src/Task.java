@@ -1,11 +1,8 @@
-import java.time.LocalDate;
-import java.util.Date;
-
 public class Task {
-    private String titulo;
-    private String categoria;
-    private String descricao;
-    private Data prazo;
+    private final String titulo;
+    private final String categoria;
+    private final String descricao;
+    private final Data prazo;
     private String status;
 
     public Task(String titulo, String categoria, String descricao, Data prazo) {
@@ -30,6 +27,10 @@ public class Task {
 
     public String isStatus() {
         return status;
+    }
+
+    public String getCategoria() {
+        return categoria;
     }
 
     public String toString() {

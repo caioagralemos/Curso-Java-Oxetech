@@ -10,9 +10,10 @@ import java.nio.file.Paths;
 import com.google.gson.reflect.TypeToken;
 
 public class TaskManager {
-    ArrayList<Task> tasks = new ArrayList<Task>();
+    ArrayList<Task> tasks = new ArrayList<>();
     Gson gson = new Gson();
     Scanner input = new Scanner(System.in);
+    Data hoje = new Data();
 
     public TaskManager() {
         try {
@@ -27,7 +28,7 @@ public class TaskManager {
     private void userInterface() {
         System.out.println("Bem-vindo(a) ao TaskManager.");
         while (true) {
-            System.out.println("\nEscolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para printar tarefas\noutro para sair\nsua escolha: ");
+            System.out.println("\nEscolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para pesquisar tasks por categoria\n5 para printar tarefas\noutro para sair\nsua escolha: ");
             String escolha = input.nextLine().strip();
             if (escolha.equals("1")) {
                 System.out.println("\nAdicionando tarefa:".toUpperCase());
@@ -39,6 +40,9 @@ public class TaskManager {
                 System.out.println("\nMarcando tarefa:".toUpperCase());
                 marcarTask();
             } else if (escolha.equals("4")) {
+                System.out.println("\nPesquisando tarefas por categoria:".toUpperCase());
+                pesquisarTasks();
+            } else if (escolha.equals("5")) {
                 System.out.println("\nPrintando tarefas:".toUpperCase());
                 printaTasks();
             } else {
@@ -109,15 +113,28 @@ public class TaskManager {
     private void marcarTask() {
         System.out.println("Digite o título da task que deseja marcar: ");
         String marcar = input.nextLine().strip().toLowerCase();
-        for (int i = 0; i < tasks.size(); i++) {
-            if(tasks.get(i).getTitulo().toLowerCase().equals(marcar)) {
-                tasks.get(i).marcarStatus();
-                System.out.println("Tarefa marcada com sucesso!");
-                System.out.println(tasks.get(i).toString());
+        for (Task task : tasks) {
+            if (task.getTitulo().toLowerCase().equals(marcar)) {
+                task.marcarStatus();
+                System.out.println("\nTarefa marcada com sucesso!");
+                System.out.println(task);
                 return;
             }
         }
         System.out.println("Task não encontrada. Tente novamente");
+    }
+
+    private void pesquisarTasks() {
+        System.out.println("Digite o nome da categoria:");
+        String pesquisa = input.nextLine().strip();
+        System.out.println("\nSuas tarefas:");
+        System.out.println("-------------");
+        for (Task task : tasks) {
+            if (task.getCategoria().equalsIgnoreCase(pesquisa)) {
+                System.out.println(task);
+                System.out.println("-------------");
+            }
+        }
     }
 
     private void printaTasks() {
@@ -126,25 +143,25 @@ public class TaskManager {
         if (escolha.equals("1")) {
             System.out.println("Suas tarefas:");
             System.out.println("-------------");
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println(tasks.get(i).toString());
+            for (Task task : tasks) {
+                System.out.println(task.toString());
                 System.out.println("-------------");
             }
         } else if (escolha.equals("2")) {
             System.out.println("Suas tarefas:");
             System.out.println("-------------");
-            for (int i = 0; i < tasks.size(); i++) {
-                if (tasks.get(i).isStatus().equals("Feito")) {
-                    System.out.println(tasks.get(i).toString());
+            for (Task task : tasks) {
+                if (task.isStatus().equals("Feito")) {
+                    System.out.println(task);
                     System.out.println("-------------");
                 }
             }
         } else {
             System.out.println("Suas tarefas:");
             System.out.println("-------------");
-            for (int i = 0; i < tasks.size(); i++) {
-                if (!tasks.get(i).isStatus().equals("A fazer")) {
-                    System.out.println(tasks.get(i).toString());
+            for (Task task : tasks) {
+                if (task.isStatus().equals("A fazer")) {
+                    System.out.println(task);
                     System.out.println("-------------");
                 }
             }
