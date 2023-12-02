@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class TaskManager {
@@ -21,14 +20,12 @@ public class TaskManager {
             byte[] jsonData = Files.readAllBytes(path);
             String json = new String(jsonData);
             tasks = gson.fromJson(json, new TypeToken<ArrayList<Task>>(){}.getType());
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        } catch (Exception ignored) {}
         userInterface();
     }
 
     private void userInterface() {
-        System.out.println("\nBem-vindo(a) ao TaskManager.");
+        System.out.println("Bem-vindo(a) ao TaskManager.");
         while (true) {
             System.out.println("\nEscolha:\n1 para adicionar\n2 para remover\n3 para marcar ou desmarcar uma tarefa\n4 para printar tarefas\noutro para sair\nsua escolha: ");
             String escolha = input.nextLine().strip();
@@ -73,7 +70,27 @@ public class TaskManager {
         System.out.println("Digite a descrição da sua task: ");
         String descricao = input.nextLine();
 
-        tasks.add(new Task(nome, categoria, descricao));
+        Data d;
+        while (true) {
+            try {
+                System.out.println("Digite a data da sua task (dia): ");
+                int dia = input.nextInt();
+
+                System.out.println("Digite a data da sua task (mes): ");
+                int mes = input.nextInt();
+
+                System.out.println("Digite a data da sua task (ano): ");
+                int ano = input.nextInt();
+                input.nextLine();
+
+                d = new Data(dia, mes, ano);
+                break;
+            } catch (Error e) {
+                System.out.println("Algo deu errado com sua data. Tente novamente\n");
+            }
+        }
+
+        tasks.add(new Task(nome, categoria, descricao, d));
     }
 
     private void removeTask() {
@@ -83,9 +100,10 @@ public class TaskManager {
             if(tasks.get(i).getTitulo().toLowerCase().equals(remove)) {
                 tasks.remove(i);
                 System.out.println("Tarefa removida com sucesso!");
-                break;
+                return;
             }
         }
+        System.out.println("Task não encontrada. Tente novamente");
     }
 
     private void marcarTask() {
@@ -96,9 +114,10 @@ public class TaskManager {
                 tasks.get(i).marcarStatus();
                 System.out.println("Tarefa marcada com sucesso!");
                 System.out.println(tasks.get(i).toString());
-                break;
+                return;
             }
         }
+        System.out.println("Task não encontrada. Tente novamente");
     }
 
     private void printaTasks() {
@@ -115,7 +134,7 @@ public class TaskManager {
             System.out.println("Suas tarefas:");
             System.out.println("-------------");
             for (int i = 0; i < tasks.size(); i++) {
-                if (tasks.get(i).isStatus()) {
+                if (tasks.get(i).isStatus().equals("Feito")) {
                     System.out.println(tasks.get(i).toString());
                     System.out.println("-------------");
                 }
@@ -124,7 +143,7 @@ public class TaskManager {
             System.out.println("Suas tarefas:");
             System.out.println("-------------");
             for (int i = 0; i < tasks.size(); i++) {
-                if (!tasks.get(i).isStatus()) {
+                if (!tasks.get(i).isStatus().equals("A fazer")) {
                     System.out.println(tasks.get(i).toString());
                     System.out.println("-------------");
                 }

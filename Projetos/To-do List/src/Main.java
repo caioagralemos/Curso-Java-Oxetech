@@ -1,5 +1,7 @@
+import java.util.Date;
+
 public class Main {
     public static void main(String[] args) {
-        TaskManager oi = new TaskManager();
+        new TaskManager();
     }
 }
