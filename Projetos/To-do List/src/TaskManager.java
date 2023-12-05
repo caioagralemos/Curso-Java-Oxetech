@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.Scanner;
 import com.google.gson.Gson;
 import java.io.FileWriter;
@@ -12,6 +11,8 @@ import com.google.gson.reflect.TypeToken;
 
 public class TaskManager {
     ArrayList<Task> tasks = new ArrayList<>();
+    ArrayList<Task> tasksDeHoje = new ArrayList<>();
+    ArrayList<Task> tasksExpiradas = new ArrayList<>();
     Gson gson = new Gson();
     Scanner scanner = new Scanner(System.in);
     Data hoje = new Data();
@@ -24,6 +25,25 @@ public class TaskManager {
             String json = new String(jsonData);
             tasks = gson.fromJson(json, new TypeToken<ArrayList<Task>>(){}.getType());
         } catch (Exception ignored) {}
+
+        if (!tasks.isEmpty()) {
+            for (Task task: tasks) {
+                if (task.prazo.compare(hoje)) {
+                    if (task.prazo.hoje(hoje)) {
+                        tasksDeHoje.add(task);
+                    }
+                } else {
+                    tasksExpiradas.add(task);
+                }
+            }
+        }
+
+        if (!tasksExpiradas.isEmpty()) {
+            for (Task task: tasksExpiradas) {
+                tasks.remove(task);
+            }
+        }
+
         userInterface();
     }
 
@@ -31,6 +51,13 @@ public class TaskManager {
         System.out.println("\nBem vindo(a) ao TaskManager.\n");
         System.out.println("TaskManager é uma aplicação para gerenciar tarefas (to-do list).");
         System.out.println("Use-o para criar novas tarefas e gerenciar tarefas existentes.");
+
+        if(!tasksDeHoje.isEmpty()) {
+            System.out.println("\nSuas tasks de hoje são:");
+            for (Task task: tasksDeHoje) {
+                System.out.println(task);
+            }
+        }
 
         while (true) {
             System.out.println();
@@ -40,8 +67,7 @@ public class TaskManager {
             System.out.println("2 - MyTasks");
             System.out.println("3 - EditTask");
             System.out.println("4 - RemoveTask");
-            System.out.println("5 - SearchTask");
-            System.out.println("6 - ConcludeTask");
+            System.out.println("5 - CheckTask");
             System.out.println("S - Exit\n");
 
             input();
@@ -54,14 +80,11 @@ public class TaskManager {
                 printaTasks();
             } else if (leitura.equals("3")) {
                 System.out.println("\nEditando tarefas:".toUpperCase());
-                editaTask();
+                editarTask();
             } else if (leitura.equals("4")) {
                 System.out.println("\nRemovendo tarefa:".toUpperCase());
                 removeTask();
             } else if (leitura.equals("5")) {
-                System.out.println("\nPesquisando tarefas por categoria:".toUpperCase());
-                pesquisarTasks();
-            } else if (leitura.equals("6")) {
                 System.out.println("\nMarcando tarefa:".toUpperCase());
                 marcarTask();
             } else {
@@ -198,10 +221,10 @@ public class TaskManager {
 
     private void pesquisarTasks() {
         output("Categorias disponiveis:");
-        ArrayList<String> categorias = new ArrayList<String>();
+        ArrayList<String> categorias = new ArrayList<>();
 
-        for(int i = 0; i < tasks.size(); i++) {
-            String categoria_atual = tasks.get(i).getCategoria();
+        for (Task task : tasks) {
+            String categoria_atual = task.getCategoria();
             if (!categorias.contains(categoria_atual)) {
                 categorias.add(categoria_atual);
                 System.out.println(categoria_atual);
@@ -224,15 +247,15 @@ public class TaskManager {
         System.out.println("Suas tarefas:");
         System.out.println("-------------");
 
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).getCategoria().equals(categoria_escolha)) {
-                System.out.println(tasks.get(i).toString());
+        for (Task task : tasks) {
+            if (task.getCategoria().equals(categoria_escolha)) {
+                System.out.println(task);
                 System.out.println("-------------");
             }
         }
     }
 
-    public void editaTask() {
+    public void editarTask() {
         if (tasks.isEmpty()) {
             output("Você ainda não tem Tasks!");
             return;
@@ -255,24 +278,24 @@ public class TaskManager {
                 }
             }
 
-            for (int i = 0; i < tasks.size(); i++) {
-                if(tasks.get(i).getTitulo().toLowerCase().equals(escolha)) {
-                    output("Qual o novo título para essa Task? (Deixe em branco para continuar com " + tasks.get(i).getTitulo()+ "): ");
+            for (Task task : tasks) {
+                if (task.getTitulo().toLowerCase().equals(escolha)) {
+                    output("Qual o novo título para essa Task? (Deixe em branco para continuar com " + task.getTitulo() + "): ");
                     String novoTitulo = scanner.nextLine().strip();
                     if (!novoTitulo.isBlank()) {
-                        tasks.get(i).setTitulo(novoTitulo);
+                        task.setTitulo(novoTitulo);
                     }
 
-                    output("Qual a nova categoria para essa Task? (Deixe em branco para continuar com " + tasks.get(i).getCategoria() + "): ");
+                    output("Qual a nova categoria para essa Task? (Deixe em branco para continuar com " + task.getCategoria() + "): ");
                     String novaCategoria = scanner.nextLine().strip();
                     if (!novaCategoria.isBlank()) {
-                        tasks.get(i).setCategoria(novaCategoria);
+                        task.setCategoria(novaCategoria);
                     }
 
                     output("Qual a nova descrição para essa Task? (Deixe em branco para continuar com a descrição atual): ");
                     String novaDescricao = scanner.nextLine().strip();
                     if (!novaDescricao.isBlank()) {
-                        tasks.get(i).setDescricao(novaDescricao);
+                        task.setDescricao(novaDescricao);
                     }
 
                     return;
@@ -283,7 +306,7 @@ public class TaskManager {
     }
 
     private void printaTasks() {
-        if (tasks.size() <= 0) {
+        if (tasks.isEmpty()) {
             output("Você ainda não tem tasks!");
             return;
         }

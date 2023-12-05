@@ -2,7 +2,7 @@ public class Task {
     private String titulo;
     private String categoria;
     private String descricao;
-    private Data prazo;
+    public Data prazo;
     private String status;
 
     public Task(String titulo, String categoria, String descricao, Data prazo) {

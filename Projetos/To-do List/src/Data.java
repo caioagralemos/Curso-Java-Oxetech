@@ -56,6 +56,11 @@ public class Data {
             throw new Error();
         }
     }
+
+    public boolean hoje(Data data2) {
+        return this.ano == data2.ano && this.mes == data2.mes && this.dia == data2.dia;
+    }
+
     public boolean compare(Data data2) {
         if (this.ano > data2.ano) {
             return true;
