@@ -70,21 +70,22 @@ public class TaskManager {
             System.out.println("5 - CheckTask");
             System.out.println("S - Fechar e Salvar Alterações\n");
 
-            input();
+            System.out.print("Digite aqui: ");
+            String escolha = scanner.nextLine();
 
-            if (leitura.equals("1")) {
+            if (escolha.equals("1")) {
                 System.out.println("\nAdicionando tarefa:".toUpperCase());
                 novaTask();
-            } else if (leitura.equals("2")) {
+            } else if (escolha.equals("2")) {
                 System.out.println("\nPrintando tarefas:".toUpperCase());
                 printaTasks();
-            } else if (leitura.equals("3")) {
+            } else if (escolha.equals("3")) {
                 System.out.println("\nEditando tarefas:".toUpperCase());
                 editarTask();
-            } else if (leitura.equals("4")) {
+            } else if (escolha.equals("4")) {
                 System.out.println("\nRemovendo tarefa:".toUpperCase());
                 removeTask();
-            } else if (leitura.equals("5")) {
+            } else if (escolha.equals("5")) {
                 System.out.println("\nMarcando tarefa:".toUpperCase());
                 marcarTask();
             } else {
@@ -156,7 +157,7 @@ public class TaskManager {
                 output("Digite a data da sua task (dia): ");
                 int dia = scanner.nextInt();
 
-                output("Digite a data da sua task (mes): ");
+                output("Digite a data da sua task (mês): ");
                 int mes = scanner.nextInt();
 
                 output("Digite a data da sua task (ano): ");
@@ -211,7 +212,7 @@ public class TaskManager {
         for (Task task : tasks) {
             if (task.getTitulo().toLowerCase().equals(marcar)) {
                 task.marcarStatus();
-                output("\nTarefa marcada com sucesso!");
+                output("Tarefa marcada com sucesso!\n");
                 System.out.println(task);
                 return;
             }
@@ -294,13 +295,11 @@ public class TaskManager {
             }
         }
 
-        System.out.println("Suas tarefas:");
-        System.out.println("-------------");
-
+        System.out.println("SUAS TASKS:\n");
         for (Task task : tasks) {
             if (task.getCategoria().equals(categoria_escolha)) {
                 System.out.println(task);
-                System.out.println("-------------");
+                System.out.println("____________");
             }
         }
     }
@@ -335,30 +334,45 @@ public class TaskManager {
                     output("Você não tem tasks para hoje!");
                     return;
                 }
-                System.out.println("Suas tarefas de hoje:");
-                System.out.println("-------------");
+                System.out.println("SUAS TASKS:\n");
                 for (Task task : tasksDeHoje) {
                     System.out.println(task.toString());
-                    System.out.println("-------------");
+                    System.out.println("____________");
                 }
                 break;
             case "2": // a fazer
-                System.out.println("Suas tarefas:");
-                System.out.println("-------------");
+                ArrayList<Task> tasksAFazer = new ArrayList<>();
                 for (Task task : tasks) {
-                    if (task.isStatus().equals("A fazer")) {
+                    if (task.isStatus().equals("Feito")) {
+                        tasksAFazer.add(task);
+                    }
+                }
+                if (tasksAFazer.isEmpty()) {
+                    output("Você não tem tasks a fazer!");
+                    return;
+                } else {
+                    System.out.println("SUAS TASKS:\n");
+                    for (Task task : tasksAFazer) {
                         System.out.println(task);
-                        System.out.println("-------------");
+                        System.out.println("____________");
                     }
                 }
                 break;
             case "3": // concluidas
-                System.out.println("Suas tarefas:");
-                System.out.println("-------------");
+                ArrayList<Task> tasksConcluidas = new ArrayList<>();
                 for (Task task : tasks) {
-                    if (task.isStatus().equals("Feito")) {
+                    if (task.isStatus().equals("A fazer")) {
+                        tasksConcluidas.add(task);
+                    }
+                }
+                if (tasksConcluidas.isEmpty()) {
+                    output("Você não tem tasks concluidas!");
+                    return;
+                } else {
+                    System.out.println("SUAS TASKS:\n");
+                    for (Task task : tasksConcluidas) {
                         System.out.println(task);
-                        System.out.println("-------------");
+                        System.out.println("____________");
                     }
                 }
                 break;
@@ -367,11 +381,10 @@ public class TaskManager {
                     output("Você ainda não tem tasks expiradas!");
                     return;
                 }
-                System.out.println("Suas tarefas:");
-                System.out.println("-------------");
+                System.out.println("SUAS TASKS:\n");
                 for (Task task : tasksExpiradas) {
                     System.out.println(task.toString());
-                    System.out.println("-------------");
+                    System.out.println("____________");
                 }
                 break;
             case "5": // por categoria

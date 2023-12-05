@@ -34,7 +34,7 @@ public class Task {
     }
 
     public String toString() {
-        return this.titulo + "\nCategoria: " +  this.categoria + "\n" + this.descricao  +
+        return this.titulo.toUpperCase() + "\nCategoria: " +  this.categoria + "\n" + this.descricao  +
                 "\nPrazo: " + this.prazo;
     }
 
