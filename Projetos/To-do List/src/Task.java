@@ -1,8 +1,8 @@
 public class Task {
-    private final String titulo;
-    private final String categoria;
-    private final String descricao;
-    private final Data prazo;
+    private String titulo;
+    private String categoria;
+    private String descricao;
+    private Data prazo;
     private String status;
 
     public Task(String titulo, String categoria, String descricao, Data prazo) {
@@ -36,5 +36,17 @@ public class Task {
     public String toString() {
         return "Tarefa: " + this.titulo + " - " +  this.categoria + "\n" + this.descricao  +
                 "\nPrazo: " + this.prazo + "\nStatus: " + this.status;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }
