@@ -34,8 +34,8 @@ public class Task {
     }
 
     public String toString() {
-        return "Tarefa: " + this.titulo + " - " +  this.categoria + "\n" + this.descricao  +
-                "\nPrazo: " + this.prazo + "\nStatus: " + this.status;
+        return this.titulo + "\nCategoria: " +  this.categoria + "\n" + this.descricao  +
+                "\nPrazo: " + this.prazo;
     }
 
     public void setTitulo(String titulo) {

@@ -68,7 +68,7 @@ public class TaskManager {
             System.out.println("3 - EditTask");
             System.out.println("4 - RemoveTask");
             System.out.println("5 - CheckTask");
-            System.out.println("S - Exit\n");
+            System.out.println("S - Fechar e Salvar Alterações\n");
 
             input();
 
@@ -219,42 +219,6 @@ public class TaskManager {
         output("Task não encontrada. Tente novamente");
     }
 
-    private void pesquisarTasks() {
-        output("Categorias disponiveis:");
-        ArrayList<String> categorias = new ArrayList<>();
-
-        for (Task task : tasks) {
-            String categoria_atual = task.getCategoria();
-            if (!categorias.contains(categoria_atual)) {
-                categorias.add(categoria_atual);
-                System.out.println(categoria_atual);
-            }
-        }
-        System.out.println();
-
-        String categoria_escolha;
-        while (true) {
-            output("Escolha o nome da categoria desejada:");
-            categoria_escolha = scanner.nextLine().strip();
-            if (categorias.contains(categoria_escolha)) {
-                break;
-            }
-            else {
-                System.out.println("Categoria não encontrada. Tente novamente");
-            }
-        }
-
-        System.out.println("Suas tarefas:");
-        System.out.println("-------------");
-
-        for (Task task : tasks) {
-            if (task.getCategoria().equals(categoria_escolha)) {
-                System.out.println(task);
-                System.out.println("-------------");
-            }
-        }
-    }
-
     public void editarTask() {
         if (tasks.isEmpty()) {
             output("Você ainda não tem Tasks!");
@@ -305,38 +269,115 @@ public class TaskManager {
         }
     }
 
+    private void pesquisarTasks() {
+        output("Categorias disponiveis:");
+        ArrayList<String> categorias = new ArrayList<>();
+
+        for (Task task : tasks) {
+            String categoria_atual = task.getCategoria();
+            if (!categorias.contains(categoria_atual)) {
+                categorias.add(categoria_atual);
+                System.out.println(categoria_atual);
+            }
+        }
+        System.out.println();
+
+        String categoria_escolha;
+        while (true) {
+            output("Escolha o nome da categoria desejada:");
+            categoria_escolha = scanner.nextLine().strip();
+            if (categorias.contains(categoria_escolha)) {
+                break;
+            }
+            else {
+                System.out.println("Categoria não encontrada. Tente novamente");
+            }
+        }
+
+        System.out.println("Suas tarefas:");
+        System.out.println("-------------");
+
+        for (Task task : tasks) {
+            if (task.getCategoria().equals(categoria_escolha)) {
+                System.out.println(task);
+                System.out.println("-------------");
+            }
+        }
+    }
+
     private void printaTasks() {
         if (tasks.isEmpty()) {
             output("Você ainda não tem tasks!");
             return;
         }
-        output("Digite:\n1 para printar todas as tasks\n2 para printar as tasks concluídas\noutro para printar tasks não concluidas");
+
+        System.out.println();
+        output("Escolha as tarefas que você quer consultar:\n");
+
+        System.out.println("1 - Tarefas de Hoje");
+        System.out.println("2 - Tarefas a Fazer");
+        System.out.println("3 - Tarefas Concluídas");
+        System.out.println("4 - Tarefas Expiradas");
+        System.out.println("5 - Tarefas por Categoria");
+        System.out.println("V - Voltar para o menu\n");
+
+        System.out.print("Digite aqui: ");
         String escolha = scanner.nextLine().strip();
-        if (escolha.equals("1")) {
-            System.out.println("Suas tarefas:");
-            System.out.println("-------------");
-            for (Task task : tasks) {
-                System.out.println(task.toString());
+
+        while (escolha.isBlank()) {
+            System.out.println("É necessário digitar sua escolha. Escolha uma das opções: ");
+            escolha = scanner.nextLine().strip();
+        }
+
+        switch (escolha) {
+            case "1": // hoje
+                if (tasksDeHoje.isEmpty()) {
+                    output("Você não tem tasks para hoje!");
+                    return;
+                }
+                System.out.println("Suas tarefas de hoje:");
                 System.out.println("-------------");
-            }
-        } else if (escolha.equals("2")) {
-            System.out.println("Suas tarefas:");
-            System.out.println("-------------");
-            for (Task task : tasks) {
-                if (task.isStatus().equals("Feito")) {
-                    System.out.println(task);
+                for (Task task : tasksDeHoje) {
+                    System.out.println(task.toString());
                     System.out.println("-------------");
                 }
-            }
-        } else {
-            System.out.println("Suas tarefas:");
-            System.out.println("-------------");
-            for (Task task : tasks) {
-                if (task.isStatus().equals("A fazer")) {
-                    System.out.println(task);
+                break;
+            case "2": // a fazer
+                System.out.println("Suas tarefas:");
+                System.out.println("-------------");
+                for (Task task : tasks) {
+                    if (task.isStatus().equals("A fazer")) {
+                        System.out.println(task);
+                        System.out.println("-------------");
+                    }
+                }
+                break;
+            case "3": // concluidas
+                System.out.println("Suas tarefas:");
+                System.out.println("-------------");
+                for (Task task : tasks) {
+                    if (task.isStatus().equals("Feito")) {
+                        System.out.println(task);
+                        System.out.println("-------------");
+                    }
+                }
+                break;
+            case "4": // expiradas
+                if (tasksExpiradas.isEmpty()) {
+                    output("Você ainda não tem tasks expiradas!");
+                    return;
+                }
+                System.out.println("Suas tarefas:");
+                System.out.println("-------------");
+                for (Task task : tasksExpiradas) {
+                    System.out.println(task.toString());
                     System.out.println("-------------");
                 }
-            }
+                break;
+            case "5": // por categoria
+                pesquisarTasks();
+                break;
+            default:
         }
     }
 }
