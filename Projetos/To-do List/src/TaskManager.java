@@ -16,7 +16,6 @@ public class TaskManager {
     Gson gson = new Gson();
     Scanner scanner = new Scanner(System.in);
     Data hoje = new Data();
-    String leitura = "";
 
     public TaskManager() {
         try {
@@ -106,11 +105,6 @@ public class TaskManager {
                 }
             }
         }
-    }
-
-    public void input() {
-        System.out.print("Digite aqui: ");
-        this.leitura = scanner.nextLine();
     }
 
     public void output(String value) {
