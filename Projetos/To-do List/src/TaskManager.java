@@ -83,7 +83,7 @@ public class TaskManager {
                 editarTask();
             } else if (escolha.equals("4")) {
                 System.out.println("\nRemovendo tarefa:".toUpperCase());
-                removeTask();
+                removerTask();
             } else if (escolha.equals("5")) {
                 System.out.println("\nMarcando tarefa:".toUpperCase());
                 marcarTask();
@@ -169,7 +169,7 @@ public class TaskManager {
         output("Task adicionada com sucesso.");
     }
 
-    private void removeTask() {
+    private void removerTask() {
         output("Digite o título da task que deseja remover: ");
         String remove = scanner.nextLine().strip().toLowerCase();
 
