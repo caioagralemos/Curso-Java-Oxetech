@@ -345,7 +345,7 @@ public class CliniCheck {
                 output("Paciente " + paciente.getNome() + " registrado com sucesso.");
                 break;
             } else {
-                output("Não foi possível encontrar paciente com esse CPF.");
+                output("Não foi possível encontrar paciente com esse CPF ou cartão SUS.");
             }
         }
         return paciente;
@@ -416,7 +416,7 @@ public class CliniCheck {
                     }
                 }
             } else {
-                output("Não foi possível encontrar médico com esse CPF.");
+                output("Não foi possível encontrar médico com esse CPF ou CRM.");
             }
         }
         return medico;
@@ -439,7 +439,7 @@ public class CliniCheck {
         if (consultas_paciente.isEmpty()) {
             output("Esse paciente não tem consultas marcadas.");
         } else {
-            output("CONSULTAS DE " + paciente.getNome());
+            output("CONSULTAS DE " + paciente.getNome().toUpperCase());
             for (Consulta c: consultas_paciente) {
                 System.out.println(c);
             }
@@ -463,7 +463,7 @@ public class CliniCheck {
         if (consultas_medico.isEmpty()) {
             output("Esse médico não tem consultas marcadas.");
         } else {
-            output("CONSULTAS DE DR(A). " + medico.getNome());
+            output("CONSULTAS DE DR(A). " + medico.getNome().toUpperCase());
             for (Consulta c: consultas_medico) {
                 System.out.println(c);
             }

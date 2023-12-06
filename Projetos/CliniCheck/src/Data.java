@@ -6,9 +6,9 @@ public class Data {
     int mes;
     int ano;
     int hora;
-    Calendar cal = GregorianCalendar.getInstance();
 
     public Data() {
+        Calendar cal = GregorianCalendar.getInstance();
         this.ano = cal.get(Calendar.YEAR);
         this.mes = cal.get(Calendar.MONTH) + 1;
         this.dia = cal.get(Calendar.DATE);
@@ -21,6 +21,7 @@ public class Data {
     }
 
     public Data (int dia, int mes, int ano, int hora) {
+        Calendar cal = GregorianCalendar.getInstance();
         if (hora >= 0 && hora < 24) {
             this.hora = hora;
         }
