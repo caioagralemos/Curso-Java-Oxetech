@@ -53,11 +53,11 @@ public class CliniCheck {
             System.out.println();
             output("Você pode me controlar usando os seguintes comandos:\n");
 
-            System.out.println("1 - Marcar Consulta");
+            System.out.println("1 - Marcar Consulta (faltam datas)");
             System.out.println("2 - Ver Consultas");
             System.out.println("3 - Adicionar Médicos");
             System.out.println("4 - Adicionar Pacientes");
-            System.out.println("5 - Gerenciar Usuários");
+            System.out.println("5 - Gerenciar Usuários (em breve)");
             System.out.println("S - Fechar e Salvar Alterações\n");
 
             System.out.print("Digite aqui: ");
@@ -279,6 +279,10 @@ public class CliniCheck {
     }
 
     private Paciente consultarPaciente() {
+        if (pacientes.isEmpty()) {
+            output("Não há pacientes cadastrados!");
+            return null;
+        }
         Paciente paciente = null;
         while (true) {
             output("Identificando Paciente - digite 1 para CPF ou 2 para SUS: ");
@@ -337,6 +341,10 @@ public class CliniCheck {
     }
 
     private Medico consultarMedico(String doenca) {
+        if (medicos.isEmpty()) {
+            output("Não há médicos cadastrados!");
+            return null;
+        }
         Medico medico = null;
         while (true) {
             output("Identificando Médico - digite 1 para CPF ou 2 para CRM: ");
@@ -452,6 +460,11 @@ public class CliniCheck {
     }
 
     private void verConsultas() {
+        if (consultas.isEmpty()) {
+            output("Não há consultas marcadas!");
+            return;
+        }
+
         System.out.print("Digite 1 para ver consultas por médico ou 2 por paciente: ");
         String escolha = scanner.nextLine();
 
