@@ -68,6 +68,7 @@ public class CliniCheck {
                 adicionarConsulta();
             } else if (escolha.equals("2")) {
                 System.out.println("\nChecando consultas:".toUpperCase());
+                verConsultas();
             } else if (escolha.equals("3")) {
                 System.out.println("\nAdicionando médico:".toUpperCase());
                 adicionarMedico();
@@ -238,15 +239,42 @@ public class CliniCheck {
             return;
         }
 
-        Medico medico = consultarMedico();
+        String doenca;
+        if(paciente.laudo.isEmpty()) {
+            output("Paciente não possui doenças no laudo.");
+            return;
+        } else {
+            output("Escolha a doença do paciente a ser consultada: ");
+            int contador = 0;
+            for (String d: paciente.laudo) {
+                System.out.println((contador+1) + " - " + d);
+            }
+            int escolha;
+            while (true) {
+                try {
+                    escolha = Integer.parseInt(scanner.nextLine().strip());
+                    if(escolha <= (paciente.laudo.size()+1) && escolha > 0) {
+                        doenca = paciente.laudo.get(escolha-1);
+                        break;
+                    } else {
+                        throw new Exception();
+                    }
+                } catch (Exception e) {
+                    output("Algo deu errado.\n");
+                    output("Escolha a doença do paciente a ser consultada: ");
+                }
+            }
+        }
+
+        // Médico
+        Medico medico = consultarMedico(doenca);
         if(medico == null) {
             return;
         }
 
-        String especialidade = paciente.laudo.get(0);
         Data data = new Data();
 
-        Consulta nova_consulta = new Consulta(medico, paciente, especialidade, data);
+        Consulta nova_consulta = new Consulta(medico, paciente, doenca, data);
         consultas.add(nova_consulta);
     }
 
@@ -308,7 +336,7 @@ public class CliniCheck {
         return paciente;
     }
 
-    private Medico consultarMedico() {
+    private Medico consultarMedico(String doenca) {
         Medico medico = null;
         while (true) {
             output("Identificando Médico - digite 1 para CPF ou 2 para CRM: ");
@@ -357,12 +385,89 @@ public class CliniCheck {
                 }
             }
             if(medico != null) {
-                output("Médico " + medico.getNome() + " registrado com sucesso.");
-                break;
+                if (doenca.isBlank()) {
+                    output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.");
+                    break;
+                } else {
+                    if (medico.especialidade.contains(doenca)) {
+                        output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.");
+                        break;
+                    } else {
+                        output("Esse médico(a) " + medico.getNome() + " não atende consultas de " + doenca + ".");
+                    }
+                }
             } else {
                 output("Não foi possível encontrar médico com esse CPF.");
             }
         }
         return medico;
+    }
+
+    private void verConsultasPaciente() {
+        Paciente paciente = consultarPaciente();
+        if (paciente == null) {
+            return;
+        }
+
+        ArrayList<Consulta> consultas_paciente = new ArrayList<>();
+
+        for (Consulta c: consultas) {
+            if (c.getPaciente() == paciente) {
+                consultas_paciente.add(c);
+            }
+        }
+
+        if (consultas_paciente.isEmpty()) {
+            output("Esse paciente não tem consultas marcadas.");
+        } else {
+            output("CONSULTAS DE " + paciente.getNome());
+            for (Consulta c: consultas_paciente) {
+                System.out.println(c);
+            }
+        }
+    }
+
+    private void verConsultasMedico() {
+        Medico medico = consultarMedico("");
+        if (medico == null) {
+            return;
+        }
+
+        ArrayList<Consulta> consultas_medico = new ArrayList<>();
+
+        for (Consulta c: consultas) {
+            if (c.getMedico() == medico) {
+                consultas_medico.add(c);
+            }
+        }
+
+        if (consultas_medico.isEmpty()) {
+            output("Esse médico não tem consultas marcadas.");
+        } else {
+            output("CONSULTAS DE DR(A). " + medico.getNome());
+            for (Consulta c: consultas_medico) {
+                System.out.println(c);
+            }
+        }
+    }
+
+    private void verConsultas() {
+        System.out.print("Digite 1 para ver consultas por médico ou 2 por paciente: ");
+        String escolha = scanner.nextLine();
+
+        while (escolha.isBlank() || (!escolha.equals("1") && !escolha.equals("2"))) {
+            output("Valor inválido.");
+            output("Digite 1 para ver consultas por médico ou 2 por paciente ou /sair pra voltar ao menu: ");
+            escolha = scanner.nextLine();
+            if(escolha.equals("/sair")) {
+                return;
+            }
+        }
+
+        if (escolha.equals("1")) {
+            verConsultasMedico();
+        } else {
+            verConsultasPaciente();
+        }
     }
 }
