@@ -84,31 +84,37 @@ public class CliniCheck {
                 if (escolha2.equals("S")) {
                     output("Tentando salvar os seus dados...");
 
-                    String json_consultas = gson.toJson(consultas);
-                    try (FileWriter fileWriter = new FileWriter("./consultas.json")) {
-                        fileWriter.write(json_consultas);
-                        output("Consultas salvas com sucesso.");
-                    } catch (IOException e) {
-                        output("Não foi possível salvar suas consultas.");
+                    if(!consultas.isEmpty()) {
+                        String json_consultas = gson.toJson(consultas);
+                        try (FileWriter fileWriter = new FileWriter("./consultas.json")) {
+                            fileWriter.write(json_consultas);
+                            output("Consultas salvas com sucesso.");
+                        } catch (IOException e) {
+                            output("Não foi possível salvar suas consultas.");
+                        }
                     }
 
-                    String json_medicos = gson.toJson(medicos);
-                    try (FileWriter fileWriter = new FileWriter("./medicos.json")) {
-                        fileWriter.write(json_medicos);
-                        output("Médicos salvos com sucesso.");
-                    } catch (IOException e) {
-                        output("Não foi possível salvar seus médicos.");
+                    if(!medicos.isEmpty()) {
+                        String json_medicos = gson.toJson(medicos);
+                        try (FileWriter fileWriter = new FileWriter("./medicos.json")) {
+                            fileWriter.write(json_medicos);
+                            output("Médicos salvos com sucesso.");
+                        } catch (IOException e) {
+                            output("Não foi possível salvar seus médicos.");
+                        }
                     }
 
-                    String json_pacientes = gson.toJson(pacientes);
-                    try (FileWriter fileWriter = new FileWriter("./pacientes.json")) {
-                        fileWriter.write(json_pacientes);
-                        output("Pacientes salvos com sucesso.");
-                    } catch (IOException e) {
-                        output("Não foi possível salvar seus pacientes.");
+                    if (!pacientes.isEmpty()) {
+                        String json_pacientes = gson.toJson(pacientes);
+                        try (FileWriter fileWriter = new FileWriter("./pacientes.json")) {
+                            fileWriter.write(json_pacientes);
+                            output("Pacientes salvos com sucesso.");
+                        } catch (IOException e) {
+                            output("Não foi possível salvar seus pacientes.");
+                        }
                     }
 
-                    output("Obrigado por utilizar o TaskManager.");
+                    output("Obrigado por utilizar o CliniCheck.");
                     break;
                 }
             }
@@ -178,6 +184,7 @@ public class CliniCheck {
 
         Medico novo_medico = new Medico(nome, cpf, crm, salario, especialidades, horarios_marcados);
         medicos.add(novo_medico);
+        output("Médico adicionado com sucesso.");
     }
 
     private void adicionarPaciente() {
@@ -230,6 +237,7 @@ public class CliniCheck {
 
         Paciente novo_paciente = new Paciente(nome, cpf, cartao_sus, laudo);
         pacientes.add(novo_paciente);
+        output("Paciente adicionado com sucesso.");
     }
 
     private void adicionarConsulta() {
@@ -248,6 +256,7 @@ public class CliniCheck {
             int contador = 0;
             for (String d: paciente.laudo) {
                 System.out.println((contador+1) + " - " + d);
+                contador++;
             }
             int escolha;
             while (true) {
@@ -276,6 +285,8 @@ public class CliniCheck {
 
         Consulta nova_consulta = new Consulta(medico, paciente, doenca, data);
         consultas.add(nova_consulta);
+        output("Consulta adicionada com sucesso.");
+        System.out.println(nova_consulta);
     }
 
     private Paciente consultarPaciente() {
@@ -420,7 +431,7 @@ public class CliniCheck {
         ArrayList<Consulta> consultas_paciente = new ArrayList<>();
 
         for (Consulta c: consultas) {
-            if (c.getPaciente() == paciente) {
+            if (c.getPaciente().getCpf().equals(paciente.getCpf()) && c.getPaciente().getSUS().equals(paciente.getSUS())) {
                 consultas_paciente.add(c);
             }
         }
@@ -444,7 +455,7 @@ public class CliniCheck {
         ArrayList<Consulta> consultas_medico = new ArrayList<>();
 
         for (Consulta c: consultas) {
-            if (c.getMedico() == medico) {
+            if (c.getMedico().getCrm().equals(medico.getCrm()) && c.getMedico().getCpf().equals(medico.getCpf())) {
                 consultas_medico.add(c);
             }
         }

@@ -12,7 +12,12 @@ public class Data {
         this.ano = cal.get(Calendar.YEAR);
         this.mes = cal.get(Calendar.MONTH) + 1;
         this.dia = cal.get(Calendar.DATE);
-        this.hora = cal.get(Calendar.HOUR);
+        int daytime = cal.get(Calendar.AM_PM);
+        if (daytime == 0) {
+            this.hora = cal.get(Calendar.HOUR);
+        } else {
+            this.hora = cal.get(Calendar.HOUR) + 12;
+        }
     }
 
     public Data (int dia, int mes, int ano, int hora) {

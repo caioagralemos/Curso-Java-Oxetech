@@ -19,7 +19,7 @@ public class Consulta {
     }
 
     public String toString() {
-        return this.paciente.getNome().toUpperCase() + " TRATANDO " +  this.especialidade.toUpperCase() + "\nDr(a)." + this.medico.getNome() +
+        return this.paciente.getNome().toUpperCase() + " TRATANDO " +  this.especialidade.toUpperCase() + "\nDr(a). " + this.medico.getNome() +
                 "\nData: " + this.data;
     }
 }
