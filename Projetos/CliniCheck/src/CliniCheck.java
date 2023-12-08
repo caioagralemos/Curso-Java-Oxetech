@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class CliniCheck {
     ArrayList<Medico> medicos = new ArrayList<>();
@@ -57,7 +59,7 @@ public class CliniCheck {
             System.out.println("2 - Ver Consultas");
             System.out.println("3 - Adicionar Médicos");
             System.out.println("4 - Adicionar Pacientes");
-            System.out.println("5 - Gerenciar Usuários (em breve)");
+            System.out.println("5 - Gerenciar Dados");
             System.out.println("S - Fechar e Salvar Alterações\n");
 
             System.out.print("Digite aqui: ");
@@ -77,6 +79,7 @@ public class CliniCheck {
                 adicionarPaciente();
             } else if (escolha.equals("5")) {
                 System.out.println("\nGerenciando usuários:".toUpperCase());
+                gerenciarUsuarios();
             } else {
                 System.out.println();
                 output("Digite S para confirmar sua saída do programa: ");
@@ -261,6 +264,7 @@ public class CliniCheck {
             int escolha;
             while (true) {
                 try {
+                    System.out.print("Digite aqui: ");
                     escolha = Integer.parseInt(scanner.nextLine().strip());
                     if(escolha <= (paciente.laudo.size()+1) && escolha > 0) {
                         doenca = paciente.laudo.get(escolha-1);
@@ -283,7 +287,7 @@ public class CliniCheck {
 
         Data data = new Data();
 
-        Consulta nova_consulta = new Consulta(medico, paciente, doenca, data);
+        Consulta nova_consulta = new Consulta(consultas.size(), medico, paciente, doenca, data);
         consultas.add(nova_consulta);
         output("Consulta adicionada com sucesso.");
         System.out.println(nova_consulta);
@@ -300,9 +304,9 @@ public class CliniCheck {
             String escolha_paciente = scanner.nextLine().strip();
             while (!escolha_paciente.equals("1") && !escolha_paciente.equals("2")) {
                 output("Algo deu errado.");
-                output("Identificando Paciente - digite 1 para CPF ou 2 para SUS ou /sair pra sair: ");
+                output("Identificando Paciente - digite 1 para CPF ou 2 para SUS ou /menu pra sair: ");
                 escolha_paciente = scanner.nextLine().strip();
-                if (escolha_paciente.equals("/sair")) {
+                if (escolha_paciente.equals("/menu")) {
                     return null;
                 }
             }
@@ -362,9 +366,9 @@ public class CliniCheck {
             String escolha_medico = scanner.nextLine().strip();
             while (!escolha_medico.equals("1") && !escolha_medico.equals("2")) {
                 output("Algo deu errado.");
-                output("Identificando Médico - digite 1 para CPF ou 2 para CRM ou /sair pra sair: ");
+                output("Identificando Médico - digite 1 para CPF ou 2 para CRM ou /menu pra sair: ");
                 escolha_medico = scanner.nextLine().strip();
-                if (escolha_medico.equals("/sair")) {
+                if (escolha_medico.equals("/menu")) {
                     return null;
                 }
             }
@@ -481,9 +485,9 @@ public class CliniCheck {
 
         while (escolha.isBlank() || (!escolha.equals("1") && !escolha.equals("2"))) {
             output("Valor inválido.");
-            output("Digite 1 para ver consultas por médico ou 2 por paciente ou /sair pra voltar ao menu: ");
+            output("Digite 1 para ver consultas por médico ou 2 por paciente ou /menu pra voltar ao menu: ");
             escolha = scanner.nextLine();
-            if(escolha.equals("/sair")) {
+            if(escolha.equals("/menu")) {
                 return;
             }
         }
@@ -492,6 +496,259 @@ public class CliniCheck {
             verConsultasMedico();
         } else {
             verConsultasPaciente();
+        }
+    }
+
+    private void gerenciarUsuarios() {
+        if (pacientes.isEmpty() && medicos.isEmpty()) {
+            output("Não há usuários cadastrados!");
+            return;
+        }
+
+        System.out.println();
+        output("Escolha sua ação:\n");
+
+        System.out.println("1 - Ver Médicos");
+        System.out.println("2 - Ver Pacientes");
+        System.out.println("3 - Editar Médicos (especialidades)");
+        System.out.println("4 - Editar Pacientes (laudos)");
+        System.out.println("5 - Remover Consultas");
+
+        System.out.print("Digite aqui: ");
+        String escolha = scanner.nextLine();
+
+        while (escolha.isBlank() || (!escolha.equals("1") && !escolha.equals("2")
+                && !escolha.equals("3") && !escolha.equals("4") && !escolha.equals("5"))) {
+            output("Valor inválido.");
+            output("Escolha sua ação ou /menu pra voltar ao menu:\n");
+
+            System.out.println("1 - Ver Médicos");
+            System.out.println("2 - Ver Pacientes");
+            System.out.println("3 - Editar Médicos (especialidades)");
+            System.out.println("4 - Editar Pacientes (laudos)");
+            System.out.println("5 - Remover Consultas");
+
+            System.out.print("Digite aqui: ");
+            escolha = scanner.nextLine();
+            if(escolha.equals("/menu")) {
+                return;
+            }
+        }
+
+        switch (escolha) {
+            case "1" -> verMedicos();
+            case "2" -> verPacientes();
+            case "3" -> editarMedicos();
+            case "4" -> editarPacientes();
+            default -> removerConsultas();
+        }
+    }
+
+    private void verPacientes() {
+        pacientes.sort(Comparator.comparing(Paciente::getNome));
+
+        System.out.println();
+        output("MOSTRANDO PACIENTES - ");
+        int contador = 1;
+        for (Paciente p: pacientes) {
+            System.out.println("Paciente " + contador + ": " + p);
+            contador++;
+        }
+    }
+
+    private void verMedicos() {
+        medicos.sort(Comparator.comparing(Medico::getNome));
+
+        System.out.println();
+        output("MOSTRANDO MÉDICOS - ");
+        int contador = 1;
+        for (Medico m: medicos) {
+            System.out.println("Médico " + contador + ": " + m);
+            contador++;
+        }
+    }
+
+    private void editarMedicos() {
+        System.out.println();
+        output("EDITANDO MÉDICOS - ");
+
+        if (medicos.isEmpty()) {
+            output("Não há médicos cadastrados!");
+            return;
+        }
+
+        Medico medico = consultarMedico("");
+        if (medico == null) {
+            return;
+        }
+
+        System.out.print("Escolha 1 para adicionar especialidades ou 2 para remover especialidades: ");
+        String escolha = scanner.nextLine();
+
+        while (!escolha.equals("1") && !escolha.equals("2")) {
+            output("Escolha inválida. Digite /menu pra voltar ao menu.");
+            System.out.print("Escolha 1 para adicionar especialidades ou 2 para remover especialidades: ");
+            escolha = scanner.nextLine();
+
+            if(escolha.equals("/menu")) {
+                return;
+            }
+        }
+
+        if(escolha.equals("1")) {
+            output("Digite as especialidades do médico e digite -1 quando tiver concluído: ");
+            int contador = medico.especialidade.size();
+            while (true) {
+                System.out.print("Digite aqui (Especialidade nº" + contador + "): ");
+                String especialidade = scanner.nextLine().strip().toUpperCase();
+
+                if(especialidade.equals("-1")) {
+                    break;
+                }
+
+                if (!especialidade.isBlank()) {
+                    contador++;
+                    medico.especialidade.add(especialidade);
+                }
+            }
+        } else {
+            if (medico.especialidade.isEmpty()) {
+                output("Médico não tem nenhuma especialidade.");
+                return;
+            } else {
+                output("Escolha a especialidade do médico a ser removida: ");
+                int contador = 0;
+                for (String d : medico.especialidade) {
+                    System.out.println((contador + 1) + " - " + d);
+                    contador++;
+                }
+                int escolha2;
+                while (true) {
+                    try {
+                        System.out.print("Digite aqui: ");
+                        escolha2 = Integer.parseInt(scanner.nextLine().strip());
+                        if(escolha2 <= (medico.especialidade.size()+1) && escolha2 > 0) {
+                            medico.especialidade.remove(escolha2-1);
+                            break;
+                        } else {
+                            throw new Exception();
+                        }
+                    } catch (Exception e) {
+                        output("Algo deu errado.\n");
+                        output("Escolha a especialidade do médico a ser removida: ");
+                    }
+                }
+            }
+        }
+    }
+
+    private void editarPacientes() {
+        System.out.println();
+        output("EDITANDO PACIENTES - ");
+
+        if (pacientes.isEmpty()) {
+            return;
+        }
+
+        Paciente paciente = consultarPaciente();
+        if (paciente == null) {
+            output("Algo deu errado.");
+            return;
+        }
+
+        System.out.print("Escolha 1 para adicionar uma doença ou 2 para remover uma doença: ");
+        String escolha = scanner.nextLine();
+
+        while (!escolha.equals("1") && !escolha.equals("2")) {
+            output("Escolha inválida. Digite /menu pra voltar ao menu.");
+            System.out.print("Escolha 1 para adicionar uma doença ou 2 para remover uma doença: ");
+            escolha = scanner.nextLine();
+
+            if(escolha.equals("/menu")) {
+                return;
+            }
+        }
+
+        if(escolha.equals("1")) {
+            output("Digite as doenças a serem adicionadas e digite -1 quando tiver concluído: ");
+            int contador = paciente.laudo.size();
+            while (true) {
+                System.out.print("Digite aqui (Especialidade nº" + contador + "): ");
+                String doenca = scanner.nextLine().strip().toUpperCase();
+
+                if(doenca.equals("-1")) {
+                    break;
+                }
+
+                if (!doenca.isBlank()) {
+                    contador++;
+                    paciente.laudo.add(doenca);
+                }
+            }
+        } else {
+            if (paciente.laudo.isEmpty()) {
+                output("Paciente não possuí doenças no laudo.");
+                return;
+            } else {
+                output("Escolha a doença a ser removida: ");
+                int contador = 0;
+                for (String d : paciente.laudo) {
+                    System.out.println((contador + 1) + " - " + d);
+                    contador++;
+                }
+                int escolha2;
+                while (true) {
+                    try {
+                        System.out.print("Digite aqui: ");
+                        escolha2 = Integer.parseInt(scanner.nextLine().strip());
+                        if(escolha2 <= (paciente.laudo.size()+1) && escolha2 > 0) {
+                            paciente.laudo.remove(escolha2-1);
+                            break;
+                        } else {
+                            throw new Exception();
+                        }
+                    } catch (Exception e) {
+                        output("Algo deu errado.\n");
+                        output("Escolha a doença a ser removida: ");
+                    }
+                }
+            }
+        }
+    }
+
+    private void removerConsultas() {
+        if (consultas.isEmpty()) {
+            output("Você não tem consultas registradas!");
+            return;
+        }
+
+        System.out.println();
+        output("REMOVENDO CONSULTAS - ");
+        while (true) {
+            for (Consulta c: consultas) {
+                System.out.println(c);
+            }
+
+            output("Digite o ID da consulta que deseja remover ou -1 para sair");
+            System.out.print("Digite aqui: ");
+
+            try {
+                int escolha = Integer.parseInt(scanner.nextLine());
+                if (escolha == -1) {
+                    return;
+                }
+                int contador = 0;
+                for (Consulta c: consultas) {
+                    if(c.getId() == escolha) {
+                        consultas.remove(contador);
+                        output("Consulta removida com sucesso.\n");
+                        break;
+                    }
+                    contador++;
+                }
+            } catch (Exception e) {
+                output("Algo deu errado. Tente novamente");
+            }
         }
     }
 }

@@ -28,4 +28,11 @@ public class Medico {
     public String getCrm() {
         return crm;
     }
+
+    public String toString() {
+        return "Nome: " + nome + " | " +
+                "CPF: " + cpf + " | " +
+                "CRM: " + crm + " | " +
+                "Especialidades: " + especialidade;
+    }
 }

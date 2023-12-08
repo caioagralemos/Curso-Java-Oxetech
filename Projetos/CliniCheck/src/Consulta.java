@@ -1,9 +1,11 @@
 public class Consulta {
+    private int id;
     private Medico medico;
     private Paciente paciente;
     private String especialidade;
     private Data data;
-    public Consulta(Medico medico, Paciente paciente, String especialidade, Data data) {
+    public Consulta(int id, Medico medico, Paciente paciente, String especialidade, Data data) {
+        this.id = id;
         this.medico = medico;
         this.paciente = paciente;
         this.especialidade = especialidade;
@@ -18,8 +20,12 @@ public class Consulta {
         return medico;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String toString() {
-        return this.paciente.getNome().toUpperCase() + " TRATANDO " +  this.especialidade.toUpperCase() + "\nDr(a). " + this.medico.getNome() +
-                "\nData: " + this.data;
+        return "CONSULTA DE ID " + this.id + " - " + this.paciente.getNome().toUpperCase() + " TRATANDO " +  this.especialidade.toUpperCase() + " com Dr(a). " + this.medico.getNome() +
+                " na data " + this.data;
     }
 }

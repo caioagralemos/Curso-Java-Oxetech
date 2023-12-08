@@ -24,4 +24,11 @@ public class Paciente {
     public String getSUS() {
         return cartao_sus;
     }
+
+    public String toString() {
+        return "Nome: " + nome + " | " +
+                "CPF: " + cpf + " | " +
+                "SUS: " + cartao_sus + " | " +
+                "Laudo: " + laudo;
+    }
 }
