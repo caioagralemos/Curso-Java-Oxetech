@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,36 +8,90 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class CliniCheck {
+    ArrayList<Conta> contas = new ArrayList<>();
     ArrayList<Medico> medicos = new ArrayList<>();
     ArrayList<Paciente> pacientes = new ArrayList<>();
     ArrayList<Consulta> consultas = new ArrayList<>();
+    ArrayList<String> cpfs = new ArrayList<>();
+    Conta usuario;
     Gson gson = new Gson();
     Scanner scanner = new Scanner(System.in);
 
     public CliniCheck() {
         try {
-            Path path_medicos = Paths.get("./medicos.json");
+            Path path_contas = Paths.get("./data/contas.json");
+            byte[] contas_jsonData = Files.readAllBytes(path_contas);
+            String contas_json = new String(contas_jsonData);
+            contas = gson.fromJson(contas_json, new TypeToken<ArrayList<Conta>>(){}.getType());
+        } catch (Exception ignored) {}
+
+        System.out.println("\nBem vindo(a) ao CliniCheck.");
+        System.out.println("CliniCheck é uma aplicação de recepção de policlínica.");
+        System.out.println("Use-o para gerenciar e marcar novas consultas.\n");
+
+        while (true) {
+            boolean off = false;
+            System.out.print("Digite o nome de usuário: ");
+            String username = scanner.nextLine().strip().toLowerCase();
+
+            if (!contas.isEmpty()) {
+                for(Conta c: contas) {
+                    if (c.user.equals(username)) {
+                        if (c.login()) {
+                            usuario = c;
+                            off = true;
+                            break;
+                        } else {
+                            output("Senha incorreta. Tente novamente\n");
+                        }
+                    }
+                }
+            } else {
+                output("Não foi encontrada uma conta com esse nome. Criando nova conta");
+                System.out.print("Digite sua nova senha: ");
+                String password = scanner.nextLine();
+                try {
+                    Conta novo_user = new Conta(username, password);
+                    contas.add(novo_user);
+                    usuario = novo_user;
+                    off = true;
+                    break;
+                } catch (Exception e) {
+                    output("Algo deu errado. Tente novamente");
+                }
+            }
+            if (off) { break; }
+        }
+
+        try {
+            Path path_medicos = Paths.get("./data/" + usuario.user + "/m.json");
             byte[] medicos_jsonData = Files.readAllBytes(path_medicos);
             String medicos_json = new String(medicos_jsonData);
             medicos = gson.fromJson(medicos_json, new TypeToken<ArrayList<Medico>>(){}.getType());
         } catch (Exception ignored) {}
 
         try {
-            Path path_pacientes = Paths.get("./pacientes.json");
+            Path path_pacientes = Paths.get("./data/" + usuario.user + "/p.json");
             byte[] pacientes_jsonData = Files.readAllBytes(path_pacientes);
             String pacientes_json = new String(pacientes_jsonData);
             pacientes = gson.fromJson(pacientes_json, new TypeToken<ArrayList<Paciente>>(){}.getType());
         } catch (Exception ignored) {}
 
         try {
-            Path path_consultas = Paths.get("./consultas.json");
+            Path path_consultas = Paths.get("./data/" + usuario.user + "/c.json");
             byte[] consultas_jsonData = Files.readAllBytes(path_consultas);
             String consultas_json = new String(consultas_jsonData);
             consultas = gson.fromJson(consultas_json, new TypeToken<ArrayList<Consulta>>(){}.getType());
+        } catch (Exception ignored) {}
+
+        try {
+            Path path_cpfs = Paths.get("./data/" + usuario.user + "/cpfs.json");
+            byte[] cpfs_jsonData = Files.readAllBytes(path_cpfs);
+            String cpfs_json = new String(cpfs_jsonData);
+            cpfs = gson.fromJson(cpfs_json, new TypeToken<ArrayList<String>>(){}.getType());
         } catch (Exception ignored) {}
 
         userInterface();
@@ -47,18 +102,16 @@ public class CliniCheck {
     }
 
     private void userInterface() {
-        System.out.println("\nBem vindo(a) ao CliniCheck.\n");
-        System.out.println("CliniCheck é uma aplicação de recepção de policlínica.");
-        System.out.println("Use-o para gerenciar e marcar novas consultas.");
+        output("Logado com sucesso! Bem vindo(a), " + usuario.user);
 
         while (true) {
             System.out.println();
             output("Você pode me controlar usando os seguintes comandos:\n");
 
-            System.out.println("1 - Marcar Consulta (faltam datas)");
+            System.out.println("1 - Marcar Consulta");
             System.out.println("2 - Ver Consultas");
-            System.out.println("3 - Adicionar Médicos");
-            System.out.println("4 - Adicionar Pacientes");
+            System.out.println("3 - Adicionar Médico");
+            System.out.println("4 - Adicionar Paciente");
             System.out.println("5 - Gerenciar Dados");
             System.out.println("S - Fechar e Salvar Alterações\n");
 
@@ -87,11 +140,29 @@ public class CliniCheck {
                 if (escolha2.equals("S")) {
                     output("Tentando salvar os seus dados...");
 
+                    File dataFolder = new File("./data");
+                    if (!dataFolder.exists()) {
+                        dataFolder.mkdir();
+                    }
+
+                    File userFolder = new File("./data/" + this.usuario.user);
+                    if(!userFolder.exists()) {
+                        userFolder.mkdir();
+                    }
+
+                    if(!contas.isEmpty()) {
+                        String json_contas = gson.toJson(contas);
+                        try (FileWriter fileWriter = new FileWriter("./data/contas.json")) {
+                            fileWriter.write(json_contas);
+                        } catch (IOException e) {
+                            output("Não foi possível salvar suas contas.");
+                        }
+                    }
+
                     if(!consultas.isEmpty()) {
                         String json_consultas = gson.toJson(consultas);
-                        try (FileWriter fileWriter = new FileWriter("./consultas.json")) {
+                        try (FileWriter fileWriter = new FileWriter("./data/" + usuario.user + "/c.json")) {
                             fileWriter.write(json_consultas);
-                            output("Consultas salvas com sucesso.");
                         } catch (IOException e) {
                             output("Não foi possível salvar suas consultas.");
                         }
@@ -99,9 +170,8 @@ public class CliniCheck {
 
                     if(!medicos.isEmpty()) {
                         String json_medicos = gson.toJson(medicos);
-                        try (FileWriter fileWriter = new FileWriter("./medicos.json")) {
+                        try (FileWriter fileWriter = new FileWriter("./data/" + usuario.user + "/m.json")) {
                             fileWriter.write(json_medicos);
-                            output("Médicos salvos com sucesso.");
                         } catch (IOException e) {
                             output("Não foi possível salvar seus médicos.");
                         }
@@ -109,11 +179,19 @@ public class CliniCheck {
 
                     if (!pacientes.isEmpty()) {
                         String json_pacientes = gson.toJson(pacientes);
-                        try (FileWriter fileWriter = new FileWriter("./pacientes.json")) {
+                        try (FileWriter fileWriter = new FileWriter("./data/" + usuario.user + "/p.json")) {
                             fileWriter.write(json_pacientes);
-                            output("Pacientes salvos com sucesso.");
                         } catch (IOException e) {
                             output("Não foi possível salvar seus pacientes.");
+                        }
+                    }
+
+                    if (!cpfs.isEmpty()) {
+                        String json_cpfs = gson.toJson(cpfs);
+                        try (FileWriter fileWriter = new FileWriter("./data/" + usuario.user + "/cpfs.json")) {
+                            fileWriter.write(json_cpfs);
+                        } catch (IOException e) {
+                            output("Não foi possível salvar seus CPFS.");
                         }
                     }
 
@@ -143,6 +221,11 @@ public class CliniCheck {
             if(cpf.equals("/menu")) {
                 return;
             }
+        }
+
+        if (cpfs.contains(cpf)) {
+            output("Esse CPF já possui cadastro no sistema.");
+            return;
         }
 
         output("Digite o CRM do médico: ");
@@ -178,15 +261,18 @@ public class CliniCheck {
             }
 
             if (!especialidade.isBlank()) {
-                contador++;
-                especialidades.add(especialidade);
+                if(!especialidades.contains(especialidade)) {
+                    contador++;
+                    especialidades.add(especialidade);
+                } else {
+                    output("Médico já possui essa especialidade.");
+                }
             }
         }
 
-        ArrayList<Data> horarios_marcados = new ArrayList<>();
-
-        Medico novo_medico = new Medico(nome, cpf, crm, salario, especialidades, horarios_marcados);
+        Medico novo_medico = new Medico(nome, cpf, crm, salario, especialidades, new ArrayList<>());
         medicos.add(novo_medico);
+        cpfs.add(cpf);
         output("Médico adicionado com sucesso.");
     }
 
@@ -211,6 +297,11 @@ public class CliniCheck {
             }
         }
 
+        if (cpfs.contains(cpf)) {
+            output("Esse CPF já possui cadastro no sistema.");
+            return;
+        }
+
         output("Digite o número do Cartão SUS do paciente: ");
         String cartao_sus = scanner.nextLine().strip();
         while (cartao_sus.isBlank()) {
@@ -233,12 +324,17 @@ public class CliniCheck {
             }
 
             if (!doenca.isBlank()) {
-                contador++;
-                laudo.add(doenca);
+                if(!laudo.contains(doenca)) {
+                    contador++;
+                    laudo.add(doenca);
+                } else {
+                    output("Paciente já tem essa doença registrada no laudo.");
+                }
             }
         }
 
-        Paciente novo_paciente = new Paciente(nome, cpf, cartao_sus, laudo);
+        Paciente novo_paciente = new Paciente(nome, cpf, cartao_sus, laudo, new ArrayList<>());
+        cpfs.add(cpf);
         pacientes.add(novo_paciente);
         output("Paciente adicionado com sucesso.");
     }
@@ -268,6 +364,7 @@ public class CliniCheck {
                     escolha = Integer.parseInt(scanner.nextLine().strip());
                     if(escolha <= (paciente.laudo.size()+1) && escolha > 0) {
                         doenca = paciente.laudo.get(escolha-1);
+                        System.out.println();
                         break;
                     } else {
                         throw new Exception();
@@ -284,12 +381,93 @@ public class CliniCheck {
         if(medico == null) {
             return;
         }
+        System.out.println();
 
-        Data data = new Data();
+        // Data
+        Data data_da_consulta;
+        while (true) {
+            try {
+                output("Digite o dia de sua consulta: ");
+                int dia = Integer.parseInt(scanner.nextLine());
 
-        Consulta nova_consulta = new Consulta(consultas.size(), medico, paciente, doenca, data);
+                output("Digite o mês de sua consulta: ");
+                int mes = Integer.parseInt(scanner.nextLine());
+
+                output("Digite o ano de sua consulta: ");
+                int ano = Integer.parseInt(scanner.nextLine());
+
+                data_da_consulta = new Data(dia, mes, ano);
+                System.out.println();
+                break;
+            } catch (Error e) {
+                output("Algo deu errado. Tente novamente");
+            }
+        }
+
+        ArrayList<Integer> horas_disponiveis = new ArrayList<>();
+        horas_disponiveis.add(8);
+        horas_disponiveis.add(9);
+        horas_disponiveis.add(10);
+        horas_disponiveis.add(11);
+        horas_disponiveis.add(14);
+        horas_disponiveis.add(15);
+        horas_disponiveis.add(16);
+        horas_disponiveis.add(17);
+
+        ArrayList<Integer> horas_indisponiveis = new ArrayList<>();
+
+        for (Data d: medico.horarios_marcados) {
+            if(d.dia == data_da_consulta.dia && d.mes == data_da_consulta.mes && d.ano == data_da_consulta.ano) {
+                if (horas_disponiveis.contains(d.hora)) {
+                    horas_indisponiveis.add(d.hora);
+                }
+            }
+        }
+
+        if (!horas_indisponiveis.isEmpty()) {
+            for (Integer hora: horas_indisponiveis) {
+                horas_disponiveis.remove(hora);
+            }
+        }
+
+        if (horas_disponiveis.isEmpty()) {
+            output("Esse médico não tem horários disponiveis nesse dia. Tente novamente mais tarde ou com outra data.\n");
+            return;
+        }
+
+        while (true) {
+            try {
+                output("Horas disponíveis:");
+                int contador = 1;
+                for (Integer hora: horas_disponiveis) {
+                    if (hora < 10) {
+                        System.out.print(contador + " -  0" + hora + ":00 |");
+                    } else {
+                        System.out.print(contador + " - " + hora + ":00 |");
+                    }
+                    contador++;
+                }
+
+                System.out.print(" Escolha seu horário pelo índice: ");
+                int choice = Integer.parseInt(scanner.nextLine());
+                data_da_consulta.setHora(horas_disponiveis.get(choice-1));
+
+                if (!paciente.horarios_marcados.contains(data_da_consulta)) {
+                    medico.horarios_marcados.add(data_da_consulta);
+                    paciente.horarios_marcados.add(data_da_consulta);
+                    break;
+                } else {
+                    throw new Error();
+                }
+            } catch (Error e) {
+                output("Algo deu errado. Tente novamente\n");
+            }
+        }
+
+        usuario.setContador();
+        Consulta nova_consulta = new Consulta(usuario.contador_consultas, medico, paciente, doenca, data_da_consulta);
         consultas.add(nova_consulta);
-        output("Consulta adicionada com sucesso.");
+        output("Consulta adicionada com sucesso.\n");
         System.out.println(nova_consulta);
     }
 
@@ -300,7 +478,7 @@ public class CliniCheck {
         }
         Paciente paciente = null;
         while (true) {
-            output("Identificando Paciente - digite 1 para CPF ou 2 para SUS: ");
+            System.out.print("Identificando Paciente - digite 1 para CPF ou 2 para SUS: ");
             String escolha_paciente = scanner.nextLine().strip();
             while (!escolha_paciente.equals("1") && !escolha_paciente.equals("2")) {
                 output("Algo deu errado.");
@@ -346,10 +524,10 @@ public class CliniCheck {
                 }
             }
             if (paciente != null) {
-                output("Paciente " + paciente.getNome() + " registrado com sucesso.");
+                output("Paciente " + paciente.getNome() + " registrado com sucesso.\n");
                 break;
             } else {
-                output("Não foi possível encontrar paciente com esse CPF ou cartão SUS.");
+                output("Não foi possível encontrar paciente com esse CPF ou cartão SUS.\n");
             }
         }
         return paciente;
@@ -362,7 +540,7 @@ public class CliniCheck {
         }
         Medico medico = null;
         while (true) {
-            output("Identificando Médico - digite 1 para CPF ou 2 para CRM: ");
+            System.out.print("Identificando Médico - digite 1 para CPF ou 2 para CRM: ");
             String escolha_medico = scanner.nextLine().strip();
             while (!escolha_medico.equals("1") && !escolha_medico.equals("2")) {
                 output("Algo deu errado.");
@@ -409,18 +587,18 @@ public class CliniCheck {
             }
             if(medico != null) {
                 if (doenca.isBlank()) {
-                    output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.");
+                    output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.\n");
                     break;
                 } else {
                     if (medico.especialidade.contains(doenca)) {
-                        output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.");
+                        output("Médico(a) " + medico.getNome() + " registrado(a) com sucesso.\n");
                         break;
                     } else {
-                        output("Esse médico(a) " + medico.getNome() + " não atende consultas de " + doenca + ".");
+                        output("Esse médico(a) " + medico.getNome() + " não atende consultas de " + doenca + ".\n");
                     }
                 }
             } else {
-                output("Não foi possível encontrar médico com esse CPF ou CRM.");
+                output("Não foi possível encontrar médico com esse CPF ou CRM.\n");
             }
         }
         return medico;
@@ -512,13 +690,16 @@ public class CliniCheck {
         System.out.println("2 - Ver Pacientes");
         System.out.println("3 - Editar Médicos (especialidades)");
         System.out.println("4 - Editar Pacientes (laudos)");
-        System.out.println("5 - Remover Consultas");
+        System.out.println("5 - Remover Médicos");
+        System.out.println("6 - Remover Pacientes");
+        System.out.println("7 - Remover Consultas\n");
 
         System.out.print("Digite aqui: ");
         String escolha = scanner.nextLine();
 
         while (escolha.isBlank() || (!escolha.equals("1") && !escolha.equals("2")
-                && !escolha.equals("3") && !escolha.equals("4") && !escolha.equals("5"))) {
+                && !escolha.equals("3") && !escolha.equals("4") && !escolha.equals("5")
+                && !escolha.equals("6") && !escolha.equals("7"))) {
             output("Valor inválido.");
             output("Escolha sua ação ou /menu pra voltar ao menu:\n");
 
@@ -526,7 +707,9 @@ public class CliniCheck {
             System.out.println("2 - Ver Pacientes");
             System.out.println("3 - Editar Médicos (especialidades)");
             System.out.println("4 - Editar Pacientes (laudos)");
-            System.out.println("5 - Remover Consultas");
+            System.out.println("5 - Excluir Médicos");
+            System.out.println("6 - Excluir Pacientes");
+            System.out.println("7 - Remover Consultas\n");
 
             System.out.print("Digite aqui: ");
             escolha = scanner.nextLine();
@@ -540,6 +723,8 @@ public class CliniCheck {
             case "2" -> verPacientes();
             case "3" -> editarMedicos();
             case "4" -> editarPacientes();
+            case "5" -> excluirMedico();
+            case "6" -> excluirPaciente();
             default -> removerConsultas();
         }
     }
@@ -607,8 +792,12 @@ public class CliniCheck {
                 }
 
                 if (!especialidade.isBlank()) {
-                    contador++;
-                    medico.especialidade.add(especialidade);
+                    if(!medico.especialidade.contains(especialidade)) {
+                        contador++;
+                        medico.especialidade.add(especialidade);
+                    } else {
+                        output("Médico já possui essa especialidade.");
+                    }
                 }
             }
         } else {
@@ -629,6 +818,7 @@ public class CliniCheck {
                         escolha2 = Integer.parseInt(scanner.nextLine().strip());
                         if(escolha2 <= (medico.especialidade.size()+1) && escolha2 > 0) {
                             medico.especialidade.remove(escolha2-1);
+                            output("Especialidade removida com sucesso.");
                             break;
                         } else {
                             throw new Exception();
@@ -681,8 +871,12 @@ public class CliniCheck {
                 }
 
                 if (!doenca.isBlank()) {
-                    contador++;
-                    paciente.laudo.add(doenca);
+                    if(!paciente.laudo.contains(doenca)) {
+                        contador++;
+                        paciente.laudo.add(doenca);
+                    } else {
+                        output("Paciente já tem essa doença registrada no laudo.");
+                    }
                 }
             }
         } else {
@@ -703,6 +897,7 @@ public class CliniCheck {
                         escolha2 = Integer.parseInt(scanner.nextLine().strip());
                         if(escolha2 <= (paciente.laudo.size()+1) && escolha2 > 0) {
                             paciente.laudo.remove(escolha2-1);
+                            output("Doença removida com sucesso.");
                             break;
                         } else {
                             throw new Exception();
@@ -750,5 +945,61 @@ public class CliniCheck {
                 output("Algo deu errado. Tente novamente");
             }
         }
+    }
+
+    private void excluirMedico() {
+        Medico medico = consultarMedico("");
+        if (medico == null) {
+            return;
+        }
+
+        ArrayList<Consulta> consultas_a_remover = new ArrayList<>();
+
+        for(Consulta c: consultas) {
+            if (c.getMedico().getCpf().equals(medico.getCpf())) {
+                consultas_a_remover.add(c);
+            }
+        }
+
+        if(!consultas_a_remover.isEmpty()) {
+            for(Consulta c: consultas_a_remover) {
+                Paciente p = c.getPaciente();
+                Data d = c.getData();
+                p.horarios_marcados.remove(d);
+                consultas.remove(c);
+            }
+        }
+
+        medicos.remove(medico);
+
+        output("Médico excluído com sucesso.");
+    }
+
+    private void excluirPaciente() {
+        Paciente paciente = consultarPaciente();
+        if (paciente == null) {
+            return;
+        }
+
+        ArrayList<Consulta> consultas_a_remover = new ArrayList<>();
+
+        for(Consulta c: consultas) {
+            if (c.getPaciente().getCpf().equals(paciente.getCpf())) {
+                consultas_a_remover.add(c);
+            }
+        }
+
+        if(!consultas_a_remover.isEmpty()) {
+            for(Consulta c: consultas_a_remover) {
+                Medico m = c.getMedico();
+                Data d = c.getData();
+                m.horarios_marcados.remove(d);
+                consultas.remove(c);
+            }
+        }
+
+        pacientes.remove(paciente);
+
+        output("Paciente excluído com sucesso.");
     }
 }

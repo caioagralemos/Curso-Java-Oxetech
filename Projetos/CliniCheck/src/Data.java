@@ -20,6 +20,51 @@ public class Data {
         }
     }
 
+    public Data (int dia, int mes, int ano) {
+        Calendar cal = GregorianCalendar.getInstance();
+        if (ano > cal.get(Calendar.YEAR)) {
+            this.ano = ano;
+            this.mes = mes;
+            this.dia = dia;
+        } else if (ano == cal.get(Calendar.YEAR)) {
+            if (mes == (cal.get(Calendar.MONTH) + 1)) {
+                if (mes == 1 || mes == 3 || mes == 5 || mes == 7 || mes == 8 || mes == 10 || mes == 12) {
+                    if (dia >= cal.get(Calendar.DATE) && dia <= 31) {
+                        this.ano = ano;
+                        this.mes = mes;
+                        this.dia = dia;
+                    } else {
+                        throw new Error();
+                    }
+                } else if (mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+                    if (dia >= cal.get(Calendar.DATE) && dia <= 30) {
+                        this.ano = ano;
+                        this.mes = mes;
+                        this.dia = dia;
+                    } else {
+                        throw new Error();
+                    }
+                } else {
+                    if (dia >= cal.get(Calendar.DATE) && dia <= 29) {
+                        this.ano = ano;
+                        this.mes = mes;
+                        this.dia = dia;
+                    } else {
+                        throw new Error();
+                    }
+                }
+            } else if (mes > (cal.get(Calendar.MONTH) + 1) && mes <= 12) {
+                this.ano = ano;
+                this.mes = mes;
+                this.dia = dia;
+            } else {
+                throw new Error();
+            }
+        } else {
+            throw new Error();
+        }
+    }
+
     public Data (int dia, int mes, int ano, int hora) {
         Calendar cal = GregorianCalendar.getInstance();
         if (hora >= 0 && hora < 24) {
@@ -87,6 +132,15 @@ public class Data {
             return false;
         }
     }
+
+    public void setHora(int hora) {
+        if (hora == 8 || hora == 9 || hora == 10 || hora == 11 || hora == 14 || hora == 15 || hora == 16 || hora == 17) {
+            this.hora = hora;
+        } else {
+            throw new Error();
+        }
+    }
+
     public String toString() {
         return this.dia + "/" + this.mes + "/" + this.ano + " " + this.hora + ":00";
     }
