@@ -34,6 +34,7 @@ public class CliniCheck {
 
         while (true) {
             boolean off = false;
+            boolean acc_found = false;
             System.out.print("Digite o nome de usuário: ");
             String username = scanner.nextLine().strip().toLowerCase();
 
@@ -43,6 +44,7 @@ public class CliniCheck {
                         if (c.login()) {
                             usuario = c;
                             off = true;
+                            acc_found = true;
                             break;
                         } else {
                             output("Senha incorreta. Tente novamente\n");
@@ -50,6 +52,20 @@ public class CliniCheck {
                     }
                 }
             } else {
+                output("Não foi encontrada uma conta com esse nome. Criando nova conta");
+                System.out.print("Digite sua nova senha: ");
+                String password = scanner.nextLine();
+                try {
+                    Conta novo_user = new Conta(username, password);
+                    contas.add(novo_user);
+                    usuario = novo_user;
+                    off = true;
+                    break;
+                } catch (Exception e) {
+                    output("Algo deu errado. Tente novamente");
+                }
+            }
+            if (!acc_found) {
                 output("Não foi encontrada uma conta com esse nome. Criando nova conta");
                 System.out.print("Digite sua nova senha: ");
                 String password = scanner.nextLine();
